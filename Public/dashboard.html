@@ -8,17 +8,46 @@
 </head>
 <body>
   <div id="root">
+    <img src="../src/logo.png" alt="Medical History Logo" style="position: absolute; top: 20px; left: 20px; max-width: 80px;">
     <h1 class="header-title">Dashboard</h1>
     <div class="form-container" style="max-width: 600px; text-align: center;">
-      <h2 style="color: #333;">Welcome to your Dashboard!</h2>
-      <p style="color: #666; margin-bottom: 30px;">You have successfully logged in.</p>
+      <h2 style="color: #333; margin-bottom: 20px;">Patient Profile</h2>
+      <div id="patient-details" style="text-align: left; margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #fcfcfc;">
+        <p style="margin: 10px 0; color: #333;"><strong>Full Name:</strong> <span id="detail-name">Loading...</span></p>
+        <p style="margin: 10px 0; color: #333;"><strong>Date of Birth:</strong> <span id="detail-dob">Loading...</span></p>
+        <p style="margin: 10px 0; color: #333;"><strong>Contact Number:</strong> <span id="detail-phone">Loading...</span></p>
+        <p style="margin: 10px 0; color: #333;"><strong>Blood Group:</strong> <span id="detail-bloodGroup">Loading...</span></p>
+        <p style="margin: 10px 0; color: #333;"><strong>Email:</strong> <span id="detail-email">Loading...</span></p>
+      </div>
+
       <div class="button-container">
         <button class="btn btn-patient" onclick="window.location.href='/'">Logout</button>
       </div>
     </div>
-    <div style="text-align: center; margin-top: 20px;">
-      <button class="btn" style="background-color: #333;" onclick="window.location.href='/'">Go Back</button>
-    </div>
   </div>
+
+  <script>
+    // Get the personalized details from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Helper function to safely get parameters and ignore 'undefined' or blank strings
+    const getParam = (paramName) => {
+      const val = urlParams.get(paramName);
+      return (val && val !== 'undefined' && val !== '') ? val : null;
+    };
+
+    const name = getParam('name');
+    const dob = getParam('dob');
+    const phone = getParam('phone');
+    const bloodGroup = getParam('bloodGroup');
+    const email = getParam('email');
+
+    // Apply the values to the HTML. If missing, show N/A.
+    document.getElementById('detail-name').innerText = name || 'N/A';
+    document.getElementById('detail-dob').innerText = dob || 'N/A';
+    document.getElementById('detail-phone').innerText = phone || 'N/A';
+    document.getElementById('detail-bloodGroup').innerText = bloodGroup || 'N/A';
+    document.getElementById('detail-email').innerText = email || 'N/A';
+  </script>
 </body>
 </html>

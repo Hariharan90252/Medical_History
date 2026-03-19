@@ -45,11 +45,17 @@ app.post('/signin', async (req, res) => {
     if (userData.role === 'doctor') {
       const newDoctor = new Doctor(userData);
       await newDoctor.save(); // Save to MongoDB
-      res.redirect('/dashboard.html');
+      
+      const redirectUrl = `/Doctor/dashboard.html?name=${encodeURIComponent(newDoctor.fullName || '')}&role=doctor&licenseNumber=${encodeURIComponent(newDoctor.licenseNumber || '')}&specialty=${encodeURIComponent(newDoctor.specialty || '')}&email=${encodeURIComponent(newDoctor.email || '')}`;
+      console.log('New Doctor redirecting to:', redirectUrl);
+      res.redirect(redirectUrl);
     } else {
       const newPatient = new Patient(userData);
       await newPatient.save(); // Save to MongoDB
-      res.redirect('/dashboard.html');
+      
+      const redirectUrl = `/dashboard.html?name=${encodeURIComponent(newPatient.fullName || '')}&role=patient&dob=${encodeURIComponent(newPatient.dob || '')}&phone=${encodeURIComponent(newPatient.phone || '')}&bloodGroup=${encodeURIComponent(newPatient.bloodGroup || '')}&email=${encodeURIComponent(newPatient.email || '')}`;
+      console.log('New Patient redirecting to:', redirectUrl);
+      res.redirect(redirectUrl);
     }
   } catch (error) {
     console.error('Error saving user:', error);
@@ -69,7 +75,18 @@ app.post('/login', async (req, res) => {
       : await Patient.findOne({ email, password });
 
     if (user) {
-      res.redirect('/dashboard.html');
+      console.log('--- USER FOUND IN DB ---');
+      console.log(user); // This will print the database record to your terminal
+
+      if (role === 'doctor') {
+        const redirectUrl = `/Doctor/dashboard.html?name=${encodeURIComponent(user.fullName || '')}&role=${role}&licenseNumber=${encodeURIComponent(user.licenseNumber || '')}&specialty=${encodeURIComponent(user.specialty || '')}&email=${encodeURIComponent(user.email || '')}`;
+        console.log('Redirecting to URL:', redirectUrl);
+        res.redirect(redirectUrl);
+      } else {
+        const redirectUrl = `/dashboard.html?name=${encodeURIComponent(user.fullName || '')}&role=${role}&dob=${encodeURIComponent(user.dob || '')}&phone=${encodeURIComponent(user.phone || '')}&bloodGroup=${encodeURIComponent(user.bloodGroup || '')}&email=${encodeURIComponent(user.email || '')}`;
+        console.log('Redirecting to URL:', redirectUrl);
+        res.redirect(redirectUrl);
+      }
     } else {
       res.send(`<h1>Login Failed</h1><p>Invalid email or password.</p><a href="/${role === 'doctor' ? 'Doctor' : 'Patient'}/login.html">Try Again</a>`);
     }

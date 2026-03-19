@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Dashboard - Medical History</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div id="root">
+    <img src="../src/logo.png" alt="Medical History Logo" style="position: absolute; top: 20px; left: 20px; max-width: 80px;">
+    <h1 class="header-title">Doctor Dashboard</h1>
+    <div class="form-container" style="max-width: 600px; text-align: center;">
+      <h2 style="color: #333; margin-bottom: 20px;">Doctor Profile</h2>
+      <div id="doctor-details" style="text-align: left; margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #fcfcfc;">
+        <p style="margin: 10px 0; color: #333;"><strong>Full Name:</strong> <span id="detail-name">Loading...</span></p>
+        <p style="margin: 10px 0; color: #333;"><strong>Specialty:</strong> <span id="detail-specialty">Loading...</span></p>
+        <p style="margin: 10px 0; color: #333;"><strong>Email:</strong> <span id="detail-email">Loading...</span></p>
+      </div>
+      <div class="button-container">
+        <button class="btn btn-doctor" onclick="window.location.href='/'">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Get the personalized details from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get('name');
+    const licenseNumber = urlParams.get('licenseNumber');
+    const specialty = urlParams.get('specialty');
+    const email = urlParams.get('email');
+
+    if (name) {
+      document.getElementById('detail-name').innerText = `Dr. ${name}`;
+      document.getElementById('detail-specialty').innerText = specialty || 'N/A';
+      document.getElementById('detail-email').innerText = email || 'N/A';
+    }
+  </script>
+</body>
+</html>

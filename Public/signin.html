@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - Medical History</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="root">
+    <h1 class="header-title" id="page-title">Account Login</h1>
+    <div class="form-container">
+      <form action="/signin" method="POST">
+        <input type="hidden" name="role" id="roleInput" value="patient">
+        
+        <div id="doctor-fields" style="display: none;">
+          <div class="form-group">
+            <label for="fullName" class="form-label">Full Name</label>
+            <input type="text" id="fullName" name="fullName" class="form-input" placeholder="Dr. John Doe">
+          </div>
+          <div class="form-group">
+            <label for="licenseNumber" class="form-label">Medical License Number</label>
+            <input type="text" id="licenseNumber" name="licenseNumber" class="form-input" placeholder="e.g. MD1234567">
+          </div>
+          <div class="form-group">
+            <label for="specialty" class="form-label">Specialty</label>
+            <input type="text" id="specialty" name="specialty" class="form-input" placeholder="e.g. Cardiology">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email" class="form-label">Email Address</label>
+          <input type="email" id="email" name="email" class="form-input" required placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" id="password" name="password" class="form-input" required placeholder="Enter your password">
+        </div>
+        <div class="button-container">
+          <button type="submit" class="btn btn-doctor" style="width: 100%;">Sign In</button>
+        </div>
+        
+        <div style="text-align: center; margin-top: 15px;">
+          <p style="margin: 0; color: #333;">I have an account. <a href="/login" style="color: #2ed573; text-decoration: none; font-weight: bold;">Login</a></p>
+        </div>
+      </form>
+    </div>
+    <div style="text-align: center; margin-top: 20px;">
+      <button class="btn" style="background-color: #333;" onclick="window.location.href='/'">Go Back</button>
+    </div>
+  </div>
+
+  <script>
+    // Check the URL for the role parameter (e.g., ?role=doctor)
+    const urlParams = new URLSearchParams(window.location.search);
+    const role = urlParams.get('role');
+    
+    if (role === 'doctor') {
+      document.getElementById('roleInput').value = 'doctor';
+      document.getElementById('doctor-fields').style.display = 'block';
+      document.getElementById('page-title').innerText = 'Doctor Registration & Verification';
+      
+      // Make doctor fields required so they cannot skip them
+      document.getElementById('fullName').required = true;
+      document.getElementById('licenseNumber').required = true;
+      document.getElementById('specialty').required = true;
+    } else {
+      document.getElementById('page-title').innerText = 'Patient Login';
+    }
+  </script>
+</body>
+</html>

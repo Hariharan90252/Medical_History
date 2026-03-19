@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Hariharan90252/Medical_History#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mongoose": "^9.3.1"
   }
 }

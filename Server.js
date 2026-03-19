@@ -3,6 +3,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const Doctor = require('./DB/Doctor');
 const Patient = require('./DB/Patient');
+const MedicalRecord = require('./DB/MedicalRecord');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,6 +15,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/medical_history')
 
 // Middleware to parse form data
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Serve static files from the 'public' directory (for style.css)
 app.use(express.static(path.join(__dirname, 'public')));
@@ -93,6 +95,73 @@ app.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Login error:', error);
     res.send(`<h1>Error</h1><p>An error occurred during login.</p><a href="/">Go Back</a>`);
+  }
+});
+
+// API to generate OTP for a patient
+app.post('/api/generate-otp', async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    // Set OTP to expire in 15 minutes
+    const otpExpires = new Date(Date.now() + 15 * 60000);
+    await Patient.findOneAndUpdate({ email }, { otp, otpExpires });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error saving OTP:', error);
+    res.status(500).json({ success: false });
+  }
+});
+
+// API to verify OTP and fetch patient details
+app.post('/api/verify-otp', async (req, res) => {
+  try {
+    const { otp } = req.body;
+    const patient = await Patient.findOne({
+      otp: otp,
+      otpExpires: { $gt: new Date() } // Ensure OTP is not expired
+    });
+
+    if (!patient) {
+      return res.status(404).json({ success: false, message: 'Invalid or expired access code.' });
+    }
+
+    // Fetch medical records for this patient
+    const records = await MedicalRecord.find({ patientId: patient._id });
+
+    res.json({ success: true, patient, records });
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    res.status(500).json({ success: false, message: 'Server error.' });
+  }
+});
+
+// API to add a new medical record
+app.post('/api/add-record', async (req, res) => {
+  console.log('--- ADD RECORD ATTEMPT ---');
+  console.log('Incoming Data:', req.body);
+  try {
+    const { patientId, doctorEmail, disease, prescription } = req.body;
+    
+    // Find the doctor by email to get their ObjectId
+    const doctor = await Doctor.findOne({ email: doctorEmail });
+    if (!doctor) {
+      console.log('Error: Doctor not found for email:', doctorEmail);
+      return res.status(404).json({ success: false, message: 'Doctor not found. Please log out and log in again.' });
+    }
+
+    const newRecord = new MedicalRecord({
+      patientId: patientId,
+      doctorId: doctor._id,
+      disease: disease,
+      prescription: prescription
+    });
+
+    await newRecord.save();
+    console.log('Success! Record saved:', newRecord);
+    res.json({ success: true, record: newRecord });
+  } catch (error) {
+    console.error('Error adding record:', error);
+    res.status(500).json({ success: false, message: 'Database error. Failed to save record.' });
   }
 });
 

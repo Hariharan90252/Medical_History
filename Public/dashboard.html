@@ -20,6 +20,16 @@
         <p style="margin: 10px 0; color: #333;"><strong>Email:</strong> <span id="detail-email">Loading...</span></p>
       </div>
 
+      <div id="otp-section" style="margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #fcfcfc;">
+        <h3 style="color: #333; margin-top: 0; margin-bottom: 10px;">Medical Access Code</h3>
+        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Generate a temporary code to share your medical history with a doctor.</p>
+        <div id="otp-display-container" style="display: none; margin-bottom: 15px;">
+          <div style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #2ed573;" id="otp-code"></div>
+          <div style="color: #ff4757; font-size: 14px; margin-top: 5px;" id="otp-timer"></div>
+        </div>
+        <button id="generate-otp-btn" class="btn btn-patient" style="width: 100%;" onclick="generateOTP()">Create a code</button>
+      </div>
+
       <div class="button-container">
         <button class="btn btn-patient" onclick="window.location.href='/'">Logout</button>
       </div>
@@ -48,6 +58,45 @@
     document.getElementById('detail-phone').innerText = phone || 'N/A';
     document.getElementById('detail-bloodGroup').innerText = bloodGroup || 'N/A';
     document.getElementById('detail-email').innerText = email || 'N/A';
+
+    // OTP Generation logic
+    let timerInterval;
+
+    function generateOTP() {
+      // Generate a random 6-digit code
+      const otp = Math.floor(100000 + Math.random() * 900000);
+      document.getElementById('otp-code').innerText = otp;
+      document.getElementById('otp-display-container').style.display = 'block';
+      document.getElementById('generate-otp-btn').style.display = 'none';
+
+      // Save OTP to database
+      fetch('/api/generate-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, otp: otp.toString() })
+      });
+
+      // 15 minutes in seconds
+      let timeLeft = 15 * 60;
+      
+      // Clear any existing timer just in case
+      clearInterval(timerInterval);
+      
+      timerInterval = setInterval(() => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        document.getElementById('otp-timer').innerText = `Valid for: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById('otp-code').innerText = 'EXPIRED';
+          document.getElementById('otp-timer').innerText = '';
+          document.getElementById('generate-otp-btn').style.display = 'block';
+          document.getElementById('generate-otp-btn').innerText = 'Generate New Code';
+        }
+        timeLeft -= 1;
+      }, 1000);
+    }
   </script>
 </body>
 </html>

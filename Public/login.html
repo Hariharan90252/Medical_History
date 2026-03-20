@@ -8,22 +8,22 @@
 </head>
 <body>
   <div id="root">
-    <h1 class="header-title">Account Login</h1>
+    <h1 class="header-title" id="page-title">Account Login</h1>
     <div class="form-container">
       <form action="/login" method="POST">
+        <input type="hidden" name="role" id="roleInput" value="patient">
         <div class="form-group">
           <label for="email" class="form-label">Email Address</label>
-          <input type="email" id="email" name="email" class="form-input" required placeholder="Enter your email">
+          <input type="email" id="email" name="email" class="form-input" required placeholder="Enter Email" autocomplete="off">
         </div>
         <div class="form-group">
           <label for="password" class="form-label">Password</label>
-          <input type="password" id="password" name="password" class="form-input" required placeholder="Enter your password">
+          <input type="password" id="password" name="password" class="form-input" required placeholder="Enter Password">
         </div>
-        <div class="button-container">
-          <button type="submit" class="btn btn-patient" style="width: 100%;">Login</button>
-        </div>
+        <div id="error-message" style="color: #ff4757; text-align: center; margin-bottom: 15px; display: none; font-weight: bold;">Invalid email or password.</div>
+        <button type="submit" id="login-btn" class="btn btn-patient" style="width: 100%;">Login</button>
         <div style="text-align: center; margin-top: 15px;">
-          <p style="margin: 0; color: #333;">Need an account? <a href="/signin?role=patient" style="color: #ff4757; text-decoration: none; font-weight: bold;">Sign In</a></p>
+          <p style="margin: 0; color: #333;">Need an account? <a id="signup-link" href="/signin?role=patient" style="color: #ff4757; text-decoration: none; font-weight: bold;">Sign Up</a></p>
         </div>
       </form>
     </div>
@@ -31,5 +31,22 @@
       <button class="btn" style="background-color: #333;" onclick="window.location.href='/'">Go Back</button>
     </div>
   </div>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const role = urlParams.get('role');
+    
+    if (role === 'doctor') {
+      document.getElementById('page-title').innerText = 'Doctor Login';
+      document.getElementById('roleInput').value = 'doctor';
+      document.getElementById('signup-link').href = '/signin?role=doctor';
+      document.getElementById('login-btn').className = 'btn btn-doctor';
+    } else {
+      document.getElementById('page-title').innerText = 'Patient Login';
+    }
+
+    if (urlParams.get('error')) {
+      document.getElementById('error-message').style.display = 'block';
+    }
+  </script>
 </body>
 </html>

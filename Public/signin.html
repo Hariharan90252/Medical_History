@@ -13,11 +13,12 @@
       <form action="/signin" method="POST">
         <input type="hidden" name="role" id="roleInput" value="patient">
         
+        <div class="form-group">
+          <label for="fullName" class="form-label">Full Name</label>
+          <input type="text" id="fullName" name="fullName" class="form-input" required placeholder="Enter your full name">
+        </div>
+
         <div id="doctor-fields" style="display: none;">
-          <div class="form-group">
-            <label for="fullName" class="form-label">Full Name</label>
-            <input type="text" id="fullName" name="fullName" class="form-input" placeholder="Dr. John Doe">
-          </div>
           <div class="form-group">
             <label for="licenseNumber" class="form-label">Medical License Number</label>
             <input type="text" id="licenseNumber" name="licenseNumber" class="form-input" placeholder="e.g. MD1234567">
@@ -25,6 +26,21 @@
           <div class="form-group">
             <label for="specialty" class="form-label">Specialty</label>
             <input type="text" id="specialty" name="specialty" class="form-input" placeholder="e.g. Cardiology">
+          </div>
+        </div>
+
+        <div id="patient-fields" style="display: none;">
+          <div class="form-group">
+            <label for="dob" class="form-label">Date of Birth</label>
+            <input type="date" id="dob" name="dob" class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="phone" class="form-label">Contact Number</label>
+            <input type="text" id="phone" name="phone" class="form-input" placeholder="e.g. 1234567890">
+          </div>
+          <div class="form-group">
+            <label for="bloodGroup" class="form-label">Blood Group</label>
+            <input type="text" id="bloodGroup" name="bloodGroup" class="form-input" placeholder="e.g. O+">
           </div>
         </div>
 
@@ -37,11 +53,11 @@
           <input type="password" id="password" name="password" class="form-input" required placeholder="Enter your password">
         </div>
         <div class="button-container">
-          <button type="submit" class="btn btn-doctor" style="width: 100%;">Sign In</button>
+          <button type="submit" id="submit-btn" class="btn btn-patient" style="width: 100%;">Sign In</button>
         </div>
         
         <div style="text-align: center; margin-top: 15px;">
-          <p style="margin: 0; color: #333;">I have an account. <a href="/login" style="color: #2ed573; text-decoration: none; font-weight: bold;">Login</a></p>
+          <p style="margin: 0; color: #333;">I have an account. <a id="login-link" href="/login?role=patient" style="color: #2ed573; text-decoration: none; font-weight: bold;">Login</a></p>
         </div>
       </form>
     </div>
@@ -61,11 +77,17 @@
       document.getElementById('page-title').innerText = 'Doctor Registration & Verification';
       
       // Make doctor fields required so they cannot skip them
-      document.getElementById('fullName').required = true;
       document.getElementById('licenseNumber').required = true;
       document.getElementById('specialty').required = true;
+      document.getElementById('submit-btn').className = 'btn btn-doctor';
+      document.getElementById('login-link').href = '/login?role=doctor';
     } else {
-      document.getElementById('page-title').innerText = 'Patient Login';
+      document.getElementById('page-title').innerText = 'Patient Registration';
+      document.getElementById('patient-fields').style.display = 'block';
+      document.getElementById('dob').required = true;
+      document.getElementById('phone').required = true;
+      document.getElementById('bloodGroup').required = true;
+      document.getElementById('login-link').href = '/login?role=patient';
     }
   </script>
 </body>

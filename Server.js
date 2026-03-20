@@ -25,7 +25,7 @@ app.use('/src', express.static(path.join(__dirname, 'src')));
 
 // Serve p1.html when visiting the root URL
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'p1.html'));
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
 // Serve signin.html when visiting the /signin URL
@@ -48,7 +48,7 @@ app.post('/signin', async (req, res) => {
       const newDoctor = new Doctor(userData);
       await newDoctor.save(); // Save to MongoDB
       
-      const redirectUrl = `/Doctor/dashboard.html?name=${encodeURIComponent(newDoctor.fullName || '')}&role=doctor&licenseNumber=${encodeURIComponent(newDoctor.licenseNumber || '')}&specialty=${encodeURIComponent(newDoctor.specialty || '')}&email=${encodeURIComponent(newDoctor.email || '')}`;
+      const redirectUrl = `/dashboard.html?name=${encodeURIComponent(newDoctor.fullName || '')}&role=doctor&licenseNumber=${encodeURIComponent(newDoctor.licenseNumber || '')}&specialty=${encodeURIComponent(newDoctor.specialty || '')}&email=${encodeURIComponent(newDoctor.email || '')}`;
       console.log('New Doctor redirecting to:', redirectUrl);
       res.redirect(redirectUrl);
     } else {
@@ -81,7 +81,7 @@ app.post('/login', async (req, res) => {
       console.log(user); // This will print the database record to your terminal
 
       if (role === 'doctor') {
-        const redirectUrl = `/Doctor/dashboard.html?name=${encodeURIComponent(user.fullName || '')}&role=${role}&licenseNumber=${encodeURIComponent(user.licenseNumber || '')}&specialty=${encodeURIComponent(user.specialty || '')}&email=${encodeURIComponent(user.email || '')}`;
+        const redirectUrl = `/dashboard.html?name=${encodeURIComponent(user.fullName || '')}&role=${role}&licenseNumber=${encodeURIComponent(user.licenseNumber || '')}&specialty=${encodeURIComponent(user.specialty || '')}&email=${encodeURIComponent(user.email || '')}`;
         console.log('Redirecting to URL:', redirectUrl);
         res.redirect(redirectUrl);
       } else {
@@ -90,7 +90,7 @@ app.post('/login', async (req, res) => {
         res.redirect(redirectUrl);
       }
     } else {
-      res.send(`<h1>Login Failed</h1><p>Invalid email or password.</p><a href="/${role === 'doctor' ? 'Doctor' : 'Patient'}/login.html">Try Again</a>`);
+      res.redirect(`/login?role=${role}&error=1`);
     }
   } catch (error) {
     console.error('Login error:', error);
@@ -162,6 +162,22 @@ app.post('/api/add-record', async (req, res) => {
   } catch (error) {
     console.error('Error adding record:', error);
     res.status(500).json({ success: false, message: 'Database error. Failed to save record.' });
+  }
+});
+
+// API to fetch medical records for a specific patient by email
+app.post('/api/my-records', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const patient = await Patient.findOne({ email });
+    if (!patient) {
+      return res.status(404).json({ success: false, message: 'Patient not found' });
+    }
+    const records = await MedicalRecord.find({ patientId: patient._id });
+    res.json({ success: true, records });
+  } catch (error) {
+    console.error('Error fetching patient records:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 

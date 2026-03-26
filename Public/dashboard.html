@@ -5,391 +5,438 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - Medical History</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+        --primary: #059669;       /* Medical Emerald Green */
+        --primary-hover: #047857; /* Darker Emerald */
+        --bg: #ecfdf5;            /* Solid fallback */
+        --card: #ffffff;
+        --text-main: #111827;     /* High contrast dark slate */
+        --text-muted: #4b5563;    /* Medium slate for secondary text */
+        --border: #a7f3d0;        /* Light emerald border */
+        --success: #10b981;
+        --danger: #ef4444;
+    }
+
+    body {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
+        color: var(--text-main);
+        margin: 0;
+        line-height: 1.5;
+        min-height: 100vh;
+    }
+
+    .navbar {
+        color: var(--text-main);
+        max-width: 1000px;
+        margin: 1rem auto 0 auto;
+        padding: 0 1rem;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        position: relative;
+    }
+    .navbar img { filter: drop-shadow(0 4px 12px rgba(5, 150, 105, 0.15)); }
+    .navbar h1 { margin: 0; display: flex; align-items: center; position: absolute; left: 50%; transform: translateX(-50%); }
+    .navbar-user { display: flex; align-items: center; gap: 1rem; }
+    .navbar a { 
+        color: var(--primary); text-decoration: none; font-weight: 500; 
+        background: var(--card); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 6px; transition: 0.2s;
+    }
+    .navbar a:hover { background: var(--border); }
+
+    .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+    
+    .card {
+        background: var(--card); border-radius: 12px; padding: 1.5rem;
+        box-shadow: 0 4px 20px -2px rgba(5, 150, 105, 0.08), 0 1px 3px 0 rgba(0,0,0,0.05);
+        border: 1px solid var(--border);
+    }
+    .card h2 { 
+        margin-top: 0; color: var(--primary); font-size: 1.25rem; 
+        border-bottom: 2px solid var(--bg); padding-bottom: 0.75rem; margin-bottom: 1.25rem;
+    }
+
+    .btn {
+        background: var(--primary); color: white; border: none; padding: 0.75rem 1.5rem;
+        border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: 500;
+        transition: background 0.2s; width: 100%; box-sizing: border-box; display: inline-block; text-align: center;
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .btn-secondary { background: #e2e8f0; color: var(--text-main); margin-bottom: 1rem; width: auto; }
+    .btn-secondary:hover { background: #cbd5e1; }
+    .btn-danger { background: #f1f5f9; color: var(--danger); border: 1px solid #cbd5e1; margin-top: 1rem; }
+    .btn-danger:hover { background: #e2e8f0; }
+    .btn-blue { background: #0284c7; width: auto; white-space: nowrap; margin: 0; }
+    .btn-blue:hover { background: #0369a1; }
+    
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.95rem; }
+    .form-group input, .form-group textarea {
+        width: 100%; padding: 0.75rem; border: 1px solid var(--border);
+        border-radius: 6px; box-sizing: border-box; font-family: inherit; font-size: 1rem;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+        outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2,132,199,0.2);
+    }
+
+    .info-row { display: flex; justify-content: space-between; border-bottom: 1px solid var(--bg); padding: 0.75rem 0; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: var(--text-muted); font-weight: 500; }
+    .info-value { font-weight: 600; text-align: right; }
+    
+    .record-card {
+        border-left: 4px solid var(--primary); background: var(--bg);
+        padding: 1.25rem; border-radius: 0 8px 8px 0; margin-bottom: 1rem;
+    }
+    .record-date { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; display: block; }
+    .record-disease { font-weight: bold; font-size: 1.1rem; margin: 0 0 0.5rem 0; color: var(--text-main); }
+    .record-prescription { margin: 0; color: var(--text-main); white-space: pre-wrap; }
+
+    .hidden { display: none !important; }
+    .alert { padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem; font-weight: 500; text-align: center; }
+    .alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    
+    .otp-display { text-align: center; margin-top: 1.5rem; font-size: 2.5rem; letter-spacing: 0.2em; font-weight: bold; color: var(--success); }
+    .otp-note { text-align: center; font-size: 0.9rem; color: var(--danger); margin-top: 0.5rem; font-weight: 500; }
+  </style>
 </head>
 <body>
-  <div id="root">
-    <img src="../src/logo.png" alt="Medical History Logo" style="position: absolute; top: 20px; left: 20px; max-width: 80px;">
-    <h1 class="header-title" id="dashboard-title">Dashboard</h1>
-    <div class="form-container" style="max-width: 600px; text-align: center;">
-      
-      <!-- PATIENT VIEW -->
-      <div id="patient-view" style="display: none;">
-        <h2 style="color: #333; margin-bottom: 20px;">Patient Profile</h2>
-        <div id="patient-details" style="text-align: left; margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #fcfcfc;">
-          <p style="margin: 10px 0; color: #333;"><strong>Full Name:</strong> <span id="detail-name">Loading...</span></p>
-          <p style="margin: 10px 0; color: #333;"><strong>Date of Birth:</strong> <span id="detail-dob">Loading...</span></p>
-          <p style="margin: 10px 0; color: #333;"><strong>Contact Number:</strong> <span id="detail-phone">Loading...</span></p>
-          <p style="margin: 10px 0; color: #333;"><strong>Blood Group:</strong> <span id="detail-bloodGroup">Loading...</span></p>
-          <p style="margin: 10px 0; color: #333;"><strong>Email:</strong> <span id="detail-email">Loading...</span></p>
-        </div>
+  <header class="navbar">
+      <h1>
+          <img src="../src/logo.png" alt="Logo" style="height: 80px; border-radius: 4px;"> 
+      </h1>
+      <div class="navbar-user">
+          <span id="userName" style="font-weight: 500;">Loading...</span>
+          <a href="/login" id="logoutBtn">Logout</a>
+      </div>
+  </header>
 
-        <div id="otp-section" style="margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #fcfcfc;">
-          <h3 style="color: #333; margin-top: 0; margin-bottom: 10px;">Medical Access Code</h3>
-          <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Generate a temporary code to share your medical history with a doctor.</p>
-          <div id="otp-display-container" style="display: none; margin-bottom: 15px;">
-            <div style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #2ed573;" id="otp-code"></div>
-            <div style="color: #ff4757; font-size: 14px; margin-top: 5px;" id="otp-timer"></div>
+  <div class="container">
+      <!-- Notification Banner -->
+      <div id="alertBox" class="alert hidden"></div>
+
+      <!-- GUEST DASHBOARD -->
+      <div id="guestDashboard" class="hidden" style="text-align: center; margin-top: 3rem;">
+          <h2>Welcome to Medical History</h2>
+          <p style="color: var(--text-muted); margin-bottom: 2rem;">Please log in to access your dashboard.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 0 auto;">
+              <button class="btn btn-blue" onclick="window.location.href='/login?role=doctor'">Login as Doctor</button>
+              <button class="btn btn-blue" onclick="window.location.href='/login?role=patient'">Login as Patient</button>
           </div>
-          <button id="generate-otp-btn" class="btn btn-patient" style="width: 100%;" onclick="generateOTP()">Create a code</button>
-        </div>
-
-        <!-- Patient Medical Records Section -->
-        <div id="medical-records-section" style="margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #fcfcfc; text-align: left;">
-          <h3 style="color: #333; margin-top: 0; margin-bottom: 15px;">My Medical History</h3>
-          <ul id="medical-history-list" style="color: #333; padding-left: 0; list-style: none; margin: 0;">
-            <li style="color: #888;">Loading records...</li>
-          </ul>
-        </div>
       </div>
 
-      <!-- DOCTOR VIEW -->
-      <div id="doctor-view" style="display: none;">
-        <h2 style="color: #333; margin-bottom: 20px;">Doctor Profile</h2>
-        <div id="doctor-details" style="text-align: left; margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #fcfcfc;">
-          <p style="margin: 10px 0; color: #333;"><strong>Full Name:</strong> <span id="doc-detail-name">Loading...</span></p>
-          <p style="margin: 10px 0; color: #333;"><strong>Specialty:</strong> <span id="doc-detail-specialty">Loading...</span></p>
-          <p style="margin: 10px 0; color: #333;"><strong>Email:</strong> <span id="doc-detail-email">Loading...</span></p>
-        </div>
-
-        <div id="otp-input-section" style="margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #fcfcfc;">
-          <h3 style="color: #333; margin-top: 0; margin-bottom: 10px;">Access Patient Records</h3>
-          <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Enter the 6-digit access code provided by the patient.</p>
-          <div class="form-group">
-            <input type="text" id="patient-otp" class="form-input" placeholder="000000" maxlength="6" style="text-align: center; font-size: 24px; letter-spacing: 5px; font-weight: bold;">
-          </div>
-          <button class="btn btn-doctor" style="width: 100%;" onclick="verifyOTP()">Verify Code</button>
-        </div>
-
-        <!-- Patient Records Slide (Hidden by default) -->
-        <div id="patient-records-section" style="display: none; margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #fcfcfc;">
-          <h3 style="color: #333; margin-top: 0; margin-bottom: 10px;">Patient Medical Records</h3>
-          <p style="color: #2ed573; font-weight: bold; margin-bottom: 15px;">Access Granted Successfully!</p>
-          
-          <div style="text-align: left; margin-bottom: 20px;">
-            <p style="margin: 10px 0; color: #333;"><strong>Patient Name:</strong> <span id="record-name">Loading...</span></p>
-            <p style="margin: 10px 0; color: #333;"><strong>Date of Birth:</strong> <span id="record-dob">Loading...</span></p>
-            <p style="margin: 10px 0; color: #333;"><strong>Blood Group:</strong> <span id="record-blood">Loading...</span></p>
-            <hr style="border: 0; border-top: 1px solid #ccc; margin: 15px 0;">
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <h4 style="color: #333; margin: 0;">Medical History</h4>
-              <button class="btn btn-doctor" style="padding: 5px 10px; font-size: 12px;" onclick="showAddRecordForm()">+ Add Record</button>
-            </div>
-            
-            <ul id="doc-medical-history-list" style="color: #333; padding-left: 0; list-style: none; margin: 0;">
-            </ul>
-
-            <div id="add-record-form" style="display: none; margin-top: 15px; padding: 15px; border: 1px dashed #ccc; border-radius: 6px; background-color: #fff;">
-              <h5 style="margin-top: 0; margin-bottom: 10px; color: #333;">New Medical Record</h5>
-              <div class="form-group" style="margin-bottom: 10px;">
-                <label class="form-label" style="font-size: 14px;">Name of Disease</label>
-                <input type="text" id="new-disease" class="form-input" placeholder="e.g. Viral Fever">
+      <!-- PATIENT DASHBOARD -->
+      <div id="patientDashboard" class="hidden">
+          <div class="grid">
+              <div class="card">
+                  <h2>Patient Profile</h2>
+                  <div class="info-row"><span class="info-label">Name</span><span class="info-value" id="pName"></span></div>
+                  <div class="info-row"><span class="info-label">Email</span><span class="info-value" id="pEmail"></span></div>
+                  <div class="info-row"><span class="info-label">D.O.B</span><span class="info-value" id="pDob"></span></div>
+                  <div class="info-row"><span class="info-label">Phone</span><span class="info-value" id="pPhone"></span></div>
+                  <div class="info-row"><span class="info-label">Blood Group</span><span class="info-value" id="pBlood"></span></div>
               </div>
-              <div class="form-group" style="margin-bottom: 15px;">
-                <label class="form-label" style="font-size: 14px;">Prescription / Details</label>
-                <textarea id="new-prescription" class="form-input" rows="3" placeholder="e.g. Paracetamol 500mg, rest for 3 days"></textarea>
+
+              <div class="card">
+                  <h2>Share Access</h2>
+                  <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.95rem;">Generate a temporary 6-digit access code to authorize your doctor to view and add to your medical records.</p>
+                  <button id="btnGenerateOtp" class="btn" onclick="generateOTP()">Generate Access Code</button>
+                  
+                  <div id="otpContainer" class="hidden">
+                      <div class="otp-display" id="otpDisplay"></div>
+                      <div class="otp-note" id="otpTimer"></div>
+                  </div>
               </div>
-              <div style="display: flex; gap: 10px;">
-                <button class="btn btn-doctor" style="flex: 1; padding: 8px; font-size: 14px;" onclick="saveRecord()">Save</button>
-                <button class="btn" style="flex: 1; padding: 8px; font-size: 14px; background-color: #ccc; color: #333;" onclick="hideAddRecordForm()">Cancel</button>
-              </div>
-            </div>
           </div>
 
-          <button class="btn" style="width: 100%; background-color: #666;" onclick="closeRecords()">Close Records</button>
-        </div>
+          <div class="card">
+              <h2>My Medical History</h2>
+              <button class="btn btn-secondary" onclick="loadPatientRecords()">↻ Refresh Records</button>
+              <div id="patientRecordsList">
+                  <p style="color: var(--text-muted);">Loading records...</p>
+              </div>
+          </div>
       </div>
 
-      <div class="button-container">
-        <button id="logout-btn" class="btn btn-patient" onclick="window.location.href='/'">Logout</button>
-        <div id="login-options" style="display: none; margin-top: 15px;">
-          <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">Login as</h3>
-          <div style="display: flex; gap: 10px;">
-            <button class="btn btn-doctor" style="flex: 1;" onclick="window.location.href='/login?role=doctor'">Doctor</button>
-            <button class="btn btn-patient" style="flex: 1;" onclick="window.location.href='/login?role=patient'">Patient</button>
+      <!-- DOCTOR DASHBOARD -->
+      <div id="doctorDashboard" class="hidden">
+          <div class="grid">
+              <div class="card">
+                  <h2>Doctor Profile</h2>
+                  <div class="info-row"><span class="info-label">Name</span><span class="info-value" id="dName"></span></div>
+                  <div class="info-row"><span class="info-label">Email</span><span class="info-value" id="dEmail"></span></div>
+                  <div class="info-row"><span class="info-label">License No</span><span class="info-value" id="dLicense"></span></div>
+                  <div class="info-row"><span class="info-label">Specialty</span><span class="info-value" id="dSpecialty"></span></div>
+              </div>
+
+              <div class="card" id="otpInputCard">
+                  <h2>Access Patient Records</h2>
+                  <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.95rem;">Enter the 6-digit access code provided by your patient to securely view and modify their medical history.</p>
+                  <div class="form-group">
+                      <input type="text" id="otpInput" placeholder="000000" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.2em; font-weight: bold;">
+                  </div>
+                  <button class="btn" onclick="verifyOTP()">Verify & Access</button>
+              </div>
           </div>
-        </div>
+
+          <!-- Active Patient View -->
+          <div id="activePatientView" class="hidden">
+              <div class="card" style="border: 2px solid var(--primary);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bg); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                      <h2 style="margin: 0; border: none; padding: 0;">
+                          Active Patient: <span id="activePatientName" style="color: var(--text-main);"></span>
+                      </h2>
+                      <button class="btn btn-secondary" style="margin: 0; padding: 0.5rem 1rem;" onclick="closePatientView()">Close Patient</button>
+                  </div>
+                  
+                  <div class="grid">
+                      <div>
+                          <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--text-muted);">Medical History</h3>
+                          <div id="doctorRecordsList"></div>
+                      </div>
+                      
+                      <div>
+                          <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--text-muted);">Add New Record</h3>
+                          <div class="form-group">
+                              <label>Diagnosis / Condition</label>
+                              <input type="text" id="diseaseInput" placeholder="e.g. Acute Bronchitis">
+                          </div>
+                          <div class="form-group">
+                              <label>Prescription / Notes</label>
+                              <textarea id="prescriptionInput" rows="4" placeholder="Medications and care instructions"></textarea>
+                          </div>
+                          <button class="btn" onclick="addRecord()">Save Medical Record</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
       </div>
-    </div>
   </div>
 
   <script>
-    // Get the personalized details from the URL
-    const urlParams = new URLSearchParams(window.location.search);
+      const urlParams = new URLSearchParams(window.location.search);
+      const getParam = (p) => { const v = urlParams.get(p); return (v && v !== 'undefined') ? v : ''; };
 
-    // Helper function to safely get parameters and ignore 'undefined' or blank strings
-    const getParam = (paramName) => {
-      const val = urlParams.get(paramName);
-      return (val && val !== 'undefined' && val !== '') ? val : null;
-    };
-
-    const role = getParam('role');
-    const name = getParam('name');
-    const email = getParam('email');
-
-    if (role === 'doctor') {
-      document.getElementById('dashboard-title').innerText = 'Doctor Dashboard';
-      document.getElementById('doctor-view').style.display = 'block';
-      document.getElementById('logout-btn').className = 'btn btn-doctor';
+      const userRole = getParam('role');
+      const userName = getParam('name');
+      const userEmail = getParam('email');
       
-      const licenseNumber = getParam('licenseNumber');
-      const specialty = getParam('specialty');
-      
-      if (name) {
-        document.getElementById('doc-detail-name').innerText = `Dr. ${name}`;
-        document.getElementById('doc-detail-specialty').innerText = specialty || 'N/A';
-        document.getElementById('doc-detail-email').innerText = email || 'N/A';
+      let activePatientId = null;
+      let timerInterval;
+
+      function showAlert(msg, isSuccess = true) {
+          const alertBox = document.getElementById('alertBox');
+          alertBox.textContent = msg;
+          alertBox.className = 'alert ' + (isSuccess ? 'alert-success' : 'alert-error');
+          alertBox.classList.remove('hidden');
+          setTimeout(() => alertBox.classList.add('hidden'), 5000);
       }
-    } else if (role === 'patient') {
-      document.getElementById('dashboard-title').innerText = 'Patient Dashboard';
-      document.getElementById('patient-view').style.display = 'block';
-      
-      const dob = getParam('dob');
-      const phone = getParam('phone');
-      const bloodGroup = getParam('bloodGroup');
-      
-      document.getElementById('detail-name').innerText = name || 'N/A';
-      document.getElementById('detail-dob').innerText = dob || 'N/A';
-      document.getElementById('detail-phone').innerText = phone || 'N/A';
-      document.getElementById('detail-bloodGroup').innerText = bloodGroup || 'N/A';
-      document.getElementById('detail-email').innerText = email || 'N/A';
-      
-      // Fetch records for patient immediately
-      fetchMyRecords();
-    } else {
-      // GUEST VIEW (Not Logged In)
-      document.getElementById('dashboard-title').innerText = 'Dashboard (Not Logged In)';
-      document.getElementById('patient-view').style.display = 'block';
-      
-      document.getElementById('detail-name').innerText = 'N/A';
-      document.getElementById('detail-dob').innerText = 'N/A';
-      document.getElementById('detail-phone').innerText = 'N/A';
-      document.getElementById('detail-bloodGroup').innerText = 'N/A';
-      document.getElementById('detail-email').innerText = 'N/A';
-      
-      document.getElementById('otp-section').style.display = 'none';
-      document.getElementById('medical-records-section').style.display = 'none';
-      
-      const logoutBtn = document.getElementById('logout-btn');
-      logoutBtn.innerText = 'Login';
-      logoutBtn.onclick = function() {
-        document.getElementById('login-options').style.display = 'block';
-        this.style.display = 'none';
-      };
-    }
 
-    // --- PATIENT LOGIC ---
-    let timerInterval;
+      document.addEventListener('DOMContentLoaded', () => {
+          if (!userRole) {
+              document.getElementById('userName').style.display = 'none';
+              document.getElementById('logoutBtn').textContent = 'Login';
+              document.getElementById('guestDashboard').classList.remove('hidden');
+              return;
+          }
 
-    function generateOTP() {
-      // Generate a random 6-digit code
-      const otp = Math.floor(100000 + Math.random() * 900000);
-      document.getElementById('otp-code').innerText = otp;
-      document.getElementById('otp-display-container').style.display = 'block';
-      document.getElementById('generate-otp-btn').style.display = 'none';
+          document.getElementById('userName').textContent = (userRole === 'doctor' ? 'Dr. ' : '') + (userName || 'User');
 
-      // Save OTP to database
-      fetch('/api/generate-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, otp: otp.toString() })
+          if (userRole === 'patient') {
+              document.getElementById('patientDashboard').classList.remove('hidden');
+              document.getElementById('pName').textContent = userName || 'N/A';
+              document.getElementById('pEmail').textContent = userEmail || 'N/A';
+              document.getElementById('pDob').textContent = getParam('dob') || 'N/A';
+              document.getElementById('pPhone').textContent = getParam('phone') || 'N/A';
+              document.getElementById('pBlood').textContent = getParam('bloodGroup') || 'N/A';
+              
+              loadPatientRecords();
+
+          } else if (userRole === 'doctor') {
+              document.getElementById('doctorDashboard').classList.remove('hidden');
+              document.getElementById('dName').textContent = 'Dr. ' + (userName || 'N/A');
+              document.getElementById('dEmail').textContent = userEmail || 'N/A';
+              document.getElementById('dLicense').textContent = getParam('licenseNumber') || 'N/A';
+              document.getElementById('dSpecialty').textContent = getParam('specialty') || 'N/A';
+          }
       });
 
-      // 15 minutes in seconds
-      let timeLeft = 15 * 60;
-      
-      // Clear any existing timer just in case
-      clearInterval(timerInterval);
-      
-      timerInterval = setInterval(() => {
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        document.getElementById('otp-timer').innerText = `Valid for: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-        
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          document.getElementById('otp-code').innerText = 'EXPIRED';
-          document.getElementById('otp-timer').innerText = '';
-          document.getElementById('generate-otp-btn').style.display = 'block';
-          document.getElementById('generate-otp-btn').innerText = 'Generate New Code';
-        }
-        timeLeft -= 1;
-      }, 1000);
-    }
-
-    // Function to fetch and display the logged-in patient's medical records
-    async function fetchMyRecords() {
-      if (!email) return;
-
-      try {
-        const response = await fetch('/api/my-records', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email })
-        });
-        
-        const data = await response.json();
-        const ul = document.getElementById('medical-history-list');
-        ul.innerHTML = ''; // Clear the "Loading records..." message
-
-        if (data.success && data.records && data.records.length > 0) {
-          data.records.forEach(rec => {
-            // Format the date and time if available
-            const dateStr = rec.date ? new Date(rec.date).toLocaleString() : '';
-            
-            ul.innerHTML += `
-              <li style="margin-bottom: 10px;">
-                <details style="background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
-                  <summary style="font-weight: bold; cursor: pointer; outline: none;">
-                    ${rec.disease} <span style="font-weight: normal; color: #888; font-size: 12px; float: right;">${dateStr}</span>
-                  </summary>
-                  <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee; color: #555; white-space: pre-wrap;">
-                    ${rec.prescription}
-                  </div>
-                </details>
-              </li>
-            `;
-          });
-        } else {
-          ul.innerHTML = '<li style="margin-bottom: 5px; color: #888;">No previous medical records found.</li>';
-        }
-      } catch (error) {
-        console.error('Error fetching records:', error);
-        document.getElementById('medical-history-list').innerHTML = '<li style="color: #ff4757;">Failed to load records. Please try again later.</li>';
-      }
-    }
-
-    // --- DOCTOR LOGIC ---
-    async function verifyOTP() {
-      const code = document.getElementById('patient-otp').value;
-      if (code.length === 6 && !isNaN(code)) {
-        try {
-          const response = await fetch('/api/verify-otp', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ otp: code })
-          });
-          const data = await response.json();
-
-          if (data.success) {
-            document.getElementById('otp-input-section').style.display = 'none';
-            document.getElementById('patient-records-section').style.display = 'block';
-            
-            document.getElementById('record-name').innerText = data.patient.fullName || 'N/A';
-            document.getElementById('record-dob').innerText = data.patient.dob || 'N/A';
-            document.getElementById('record-blood').innerText = data.patient.bloodGroup || 'N/A';
-            
-            window.currentPatientId = data.patient._id;
-            
-            const ul = document.getElementById('doc-medical-history-list');
-            ul.innerHTML = ''; 
-            if (data.records && data.records.length > 0) {
-              data.records.forEach(rec => {
-                const dateStr = rec.date ? new Date(rec.date).toLocaleString() : '';
-                ul.innerHTML += `
-                  <li style="margin-bottom: 10px;">
-                    <details style="background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
-                      <summary style="font-weight: bold; cursor: pointer; outline: none;">
-                        ${rec.disease} <span style="font-weight: normal; color: #888; font-size: 12px; float: right;">${dateStr}</span>
-                      </summary>
-                      <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee; color: #555; white-space: pre-wrap;">
-                        ${rec.prescription}
-                      </div>
-                    </details>
-                  </li>
-                `;
+      // PATIENT FUNCTIONS
+      async function generateOTP() {
+          const otp = Math.floor(100000 + Math.random() * 900000).toString();
+          try {
+              const res = await fetch('/api/generate-otp', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email: userEmail, otp })
               });
-            } else {
-              ul.innerHTML = '<li style="margin-bottom: 5px; color: #888;">No previous records found.</li>';
-            }
+              const data = await res.json();
+              if (data.success) {
+                  document.getElementById('btnGenerateOtp').classList.add('hidden');
+                  document.getElementById('otpDisplay').textContent = otp;
+                  document.getElementById('otpContainer').classList.remove('hidden');
+                  showAlert('Access code generated successfully!');
+                  
+                  let timeLeft = 15 * 60;
+                  clearInterval(timerInterval);
+                  timerInterval = setInterval(() => {
+                      const m = Math.floor(timeLeft / 60);
+                      const s = timeLeft % 60;
+                      document.getElementById('otpTimer').textContent = `Expires in: ${m}:${s < 10 ? '0' : ''}${s}`;
+                      if (timeLeft <= 0) {
+                          clearInterval(timerInterval);
+                          document.getElementById('otpDisplay').textContent = 'EXPIRED';
+                          document.getElementById('otpTimer').textContent = '';
+                          document.getElementById('btnGenerateOtp').classList.remove('hidden');
+                          document.getElementById('btnGenerateOtp').textContent = 'Generate New Code';
+                      }
+                      timeLeft--;
+                  }, 1000);
+              } else {
+                  showAlert('Failed to generate code.', false);
+              }
+          } catch (err) {
+              showAlert('Server connection error.', false);
+          }
+      }
+
+      async function loadPatientRecords() {
+          const list = document.getElementById('patientRecordsList');
+          list.innerHTML = '<p style="color: var(--text-muted);">Fetching your latest records...</p>';
+          
+          try {
+              const res = await fetch('/api/my-records', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email: userEmail })
+              });
+              const data = await res.json();
+              
+              if (data.success && data.records.length > 0) {
+                  list.innerHTML = data.records.map(r => `
+                      <div class="record-card">
+                          <span class="record-date">${new Date(r.date).toLocaleString()}</span>
+                          <p class="record-disease">${r.disease}</p>
+                          <p class="record-prescription">${r.prescription}</p>
+                      </div>
+                  `).reverse().join('');
+              } else {
+                  list.innerHTML = '<p style="color: var(--text-muted);">No medical records found in your history.</p>';
+              }
+          } catch (err) {
+              list.innerHTML = '<p style="color: var(--danger);">Failed to load records.</p>';
+          }
+      }
+
+      // DOCTOR FUNCTIONS
+      async function verifyOTP() {
+          const otp = document.getElementById('otpInput').value.trim();
+          if (otp.length !== 6 || isNaN(otp)) return showAlert('Please enter a valid 6-digit access code.', false);
+
+          try {
+              const res = await fetch('/api/verify-otp', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ otp })
+              });
+              const data = await res.json();
+              
+              if (data.success) {
+                  activePatientId = data.patient._id;
+                  document.getElementById('otpInputCard').classList.add('hidden');
+                  document.getElementById('activePatientView').classList.remove('hidden');
+                  document.getElementById('activePatientName').textContent = data.patient.fullName || data.patient.email;
+                  
+                  renderDoctorRecordsView(data.records);
+                  showAlert('Patient identity verified. Securely accessing records.');
+              } else {
+                  showAlert(data.message || 'Invalid or expired access code.', false);
+              }
+          } catch (err) {
+              showAlert('Error connecting to the server.', false);
+          }
+      }
+
+      function renderDoctorRecordsView(records) {
+          const list = document.getElementById('doctorRecordsList');
+          if (records && records.length > 0) {
+              list.innerHTML = records.map(r => `
+                  <div class="record-card" style="padding: 1rem;">
+                      <span class="record-date">${new Date(r.date).toLocaleString()}</span>
+                      <p class="record-disease" style="font-size: 1rem;">${r.disease}</p>
+                      <p class="record-prescription" style="font-size: 0.9rem;">${r.prescription}</p>
+                  </div>
+              `).reverse().join('');
           } else {
-            alert(data.message || 'Verification failed. Please check the code.');
+              list.innerHTML = '<p style="color: var(--text-muted); font-size: 0.95rem;">No prior medical history on file.</p>';
           }
-        } catch (error) {
-          alert('An error occurred verifying the code.');
-        }
-      } else {
-        alert('Please enter a valid 6-digit numeric code.');
-      }
-    }
-
-    function closeRecords() {
-      document.getElementById('patient-otp').value = '';
-      document.getElementById('patient-records-section').style.display = 'none';
-      document.getElementById('otp-input-section').style.display = 'block';
-    }
-
-    function showAddRecordForm() {
-      document.getElementById('add-record-form').style.display = 'block';
-    }
-
-    function hideAddRecordForm() {
-      document.getElementById('add-record-form').style.display = 'none';
-      document.getElementById('new-disease').value = '';
-      document.getElementById('new-prescription').value = '';
-    }
-
-    async function saveRecord() {
-      const disease = document.getElementById('new-disease').value;
-      const prescription = document.getElementById('new-prescription').value;
-      const doctorEmail = getParam('email');
-      
-      if (!doctorEmail) {
-        alert('Error: Your session email is missing. Please log out and log in again.');
-        return;
       }
 
-      if (!disease.trim()) {
-        alert('Please enter the Name of the Disease.');
-        return;
-      }
-      
-      if (!prescription.trim()) {
-        alert('Please enter the Prescription or Details.');
-        return;
+      function closePatientView() {
+          activePatientId = null;
+          document.getElementById('otpInput').value = '';
+          document.getElementById('activePatientView').classList.add('hidden');
+          document.getElementById('otpInputCard').classList.remove('hidden');
       }
 
-      try {
-        const response = await fetch('/api/add-record', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            patientId: window.currentPatientId,
-            doctorEmail: doctorEmail,
-            disease: disease,
-            prescription: prescription
-          })
-        });
-        
-        const data = await response.json();
-        if (data.success) {
-          const ul = document.getElementById('doc-medical-history-list');
-          if (ul.innerHTML.includes('No previous records found.')) {
-            ul.innerHTML = '';
+      async function addRecord() {
+          const disease = document.getElementById('diseaseInput').value.trim();
+          const prescription = document.getElementById('prescriptionInput').value.trim();
+
+          if (!disease || !prescription) {
+              return showAlert('Please fill out both Diagnosis and Prescription fields.', false);
           }
-          const dateStr = data.record && data.record.date ? new Date(data.record.date).toLocaleString() : new Date().toLocaleString();
-          ul.innerHTML += `
-            <li style="margin-bottom: 10px;">
-              <details style="background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
-                <summary style="font-weight: bold; cursor: pointer; outline: none;">
-                  ${disease} <span style="font-weight: normal; color: #888; font-size: 12px; float: right;">${dateStr}</span>
-                </summary>
-                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee; color: #555; white-space: pre-wrap;">
-                  ${prescription}
-                </div>
-              </details>
-            </li>
-          `;
-          hideAddRecordForm();
-          alert('Record successfully saved to database!');
-        } else {
-          alert('Server said: ' + data.message);
-        }
-      } catch (error) {
-        console.error(error);
-        alert('Network Error: Did you remember to restart your Node.js server?');
+          if (!userEmail) {
+              return showAlert('Doctor email missing from session. Please login again.', false);
+          }
+
+          const btn = event.target;
+          btn.textContent = 'Saving...';
+          btn.disabled = true;
+
+          try {
+              const res = await fetch('/api/add-record', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                      patientId: activePatientId,
+                      doctorEmail: userEmail,
+                      disease,
+                      prescription
+                  })
+              });
+              const data = await res.json();
+              
+              if (data.success) {
+                  showAlert('Record securely added to patient history!');
+                  document.getElementById('diseaseInput').value = '';
+                  document.getElementById('prescriptionInput').value = '';
+                  
+                  const list = document.getElementById('doctorRecordsList');
+                  if (list.innerHTML.includes('No prior medical history')) list.innerHTML = '';
+                  
+                  const newHtml = `
+                      <div class="record-card" style="padding: 1rem;">
+                          <span class="record-date">${new Date(data.record.date).toLocaleString()}</span>
+                          <p class="record-disease" style="font-size: 1rem;">${data.record.disease}</p>
+                          <p class="record-prescription" style="font-size: 0.9rem;">${data.record.prescription}</p>
+                      </div>
+                  `;
+                  list.insertAdjacentHTML('afterbegin', newHtml);
+              } else {
+                  showAlert(data.message || 'Failed to append medical record.', false);
+              }
+          } catch (err) {
+              showAlert('A network error prevented the record from saving.', false);
+          } finally {
+              btn.textContent = 'Save Medical Record';
+              btn.disabled = false;
+          }
       }
-    }
   </script>
 </body>
 </html>

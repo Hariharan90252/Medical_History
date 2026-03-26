@@ -1,4 +1,4 @@
-# Medical History Portal
+# Medical History
 
 A web-based application designed to securely manage and share patient medical records. The platform features a dual-role system (Patients and Doctors) where patients maintain control over who accesses their medical history through a secure, time-sensitive One-Time Password (OTP) authorization system.
 

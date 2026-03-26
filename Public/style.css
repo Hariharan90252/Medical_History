@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
+  background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -8,14 +8,14 @@ body {
 
 .header-title {
   text-align: center;
-  color: #ffffff;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  color: #333333;
 }
 
 .logo {
   display: block;
   margin: 20px auto;
   max-width: 150px;
+  filter: drop-shadow(0 4px 12px rgba(5, 150, 105, 0.15));
 }
 
 .button-container {

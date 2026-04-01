@@ -14,13 +14,13 @@
         --text-main: #111827;     /* High contrast dark slate */
         --text-muted: #4b5563;    /* Medium slate for secondary text */
         --border: #a7f3d0;        /* Light emerald border */
-        --success: #10b981;
+        --success: #1c6f54;
         --danger: #ef4444;
     }
 
     body {
         font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
+        background: linear-gradient(135deg, #7cdba9 0%, #ecfdf5 100%);
         color: var(--text-main);
         margin: 0;
         line-height: 1.5;
@@ -120,10 +120,11 @@
       <div id="alertBox" class="alert hidden"></div>
 
       <!-- GUEST DASHBOARD -->
-      <div id="guestDashboard" class="hidden" style="text-align: center; margin-top: 3rem;">
+      <div id="guestDashboard" class="hidden" style="text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 70vh;">
+          <img src="../src/logo.png" alt="Medical History Logo" style="height: 120px; margin-bottom: 1.5rem; border-radius: 8px; filter: drop-shadow(0 4px 12px rgba(5, 150, 105, 0.15));">
           <h2>Welcome to Medical History</h2>
           <p style="color: var(--text-muted); margin-bottom: 2rem;">Please log in to access your dashboard.</p>
-          <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 0 auto;">
+          <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
               <button class="btn btn-blue" onclick="window.location.href='/login?role=doctor'">Login as Doctor</button>
               <button class="btn btn-blue" onclick="window.location.href='/login?role=patient'">Login as Patient</button>
           </div>
@@ -238,8 +239,7 @@
 
       document.addEventListener('DOMContentLoaded', () => {
           if (!userRole) {
-              document.getElementById('userName').style.display = 'none';
-              document.getElementById('logoutBtn').textContent = 'Login';
+              document.querySelector('.navbar').style.display = 'none';
               document.getElementById('guestDashboard').classList.remove('hidden');
               return;
           }

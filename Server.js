@@ -17,25 +17,25 @@ mongoose.connect('mongodb://127.0.0.1:27017/medical_history')
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Serve static files from the 'public' directory (for style.css)
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static files from the 'Public' directory (for style.css)
+app.use(express.static(path.join(__dirname, 'Public')));
 
 // Serve static files from the 'src' directory (for logo.png)
 app.use('/src', express.static(path.join(__dirname, 'src')));
 
 // Serve p1.html when visiting the root URL
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+  res.sendFile(path.join(__dirname, 'Public', 'dashboard.html'));
 });
 
 // Serve signin.html when visiting the /signin URL
 app.get('/signin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'signin.html'));
+  res.sendFile(path.join(__dirname, 'Public', 'signin.html'));
 });
 
 // Serve login.html when visiting the /login URL
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+  res.sendFile(path.join(__dirname, 'Public', 'login.html'));
 });
 
 // Handle form submissions from the login/registration page

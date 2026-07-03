@@ -111,7 +111,7 @@
       </h1>
       <div class="navbar-user">
           <span id="userName" style="font-weight: 500;">Loading...</span>
-          <a href="/login" id="logoutBtn">Logout</a>
+          <a href="/logout" id="logoutBtn">Logout</a>
       </div>
   </header>
 
@@ -219,13 +219,7 @@
   </div>
 
   <script>
-      const urlParams = new URLSearchParams(window.location.search);
-      const getParam = (p) => { const v = urlParams.get(p); return (v && v !== 'undefined') ? v : ''; };
-
-      const userRole = getParam('role');
-      const userName = getParam('name');
-      const userEmail = getParam('email');
-      
+      let currentUser = null;
       let activePatientId = null;
       let timerInterval;
 
@@ -237,33 +231,47 @@
           setTimeout(() => alertBox.classList.add('hidden'), 5000);
       }
 
-      document.addEventListener('DOMContentLoaded', () => {
-          if (!userRole) {
+      async function loadUserProfile() {
+          try {
+              const res = await fetch('/api/me');
+              
+              if (!res.ok) {
+                  // No valid token or session
+                  document.querySelector('.navbar').style.display = 'none';
+                  document.getElementById('guestDashboard').classList.remove('hidden');
+                  return;
+              }
+
+              const data = await res.json();
+              currentUser = data.user;
+
+              document.getElementById('userName').textContent = (currentUser.role === 'doctor' ? 'Dr. ' : '') + (currentUser.fullName || 'User');
+
+              if (currentUser.role === 'patient') {
+                  document.getElementById('patientDashboard').classList.remove('hidden');
+                  document.getElementById('pName').textContent = currentUser.fullName || 'N/A';
+                  document.getElementById('pEmail').textContent = currentUser.email || 'N/A';
+                  document.getElementById('pDob').textContent = currentUser.dob || 'N/A';
+                  document.getElementById('pPhone').textContent = currentUser.phone || 'N/A';
+                  document.getElementById('pBlood').textContent = currentUser.bloodGroup || 'N/A';
+                  
+                  loadPatientRecords();
+
+              } else if (currentUser.role === 'doctor') {
+                  document.getElementById('doctorDashboard').classList.remove('hidden');
+                  document.getElementById('dName').textContent = 'Dr. ' + (currentUser.fullName || 'N/A');
+                  document.getElementById('dEmail').textContent = currentUser.email || 'N/A';
+                  document.getElementById('dLicense').textContent = currentUser.licenseNumber || 'N/A';
+                  document.getElementById('dSpecialty').textContent = currentUser.specialty || 'N/A';
+              }
+          } catch (error) {
+              console.error('Error loading user profile:', error);
               document.querySelector('.navbar').style.display = 'none';
               document.getElementById('guestDashboard').classList.remove('hidden');
-              return;
           }
+      }
 
-          document.getElementById('userName').textContent = (userRole === 'doctor' ? 'Dr. ' : '') + (userName || 'User');
-
-          if (userRole === 'patient') {
-              document.getElementById('patientDashboard').classList.remove('hidden');
-              document.getElementById('pName').textContent = userName || 'N/A';
-              document.getElementById('pEmail').textContent = userEmail || 'N/A';
-              document.getElementById('pDob').textContent = getParam('dob') || 'N/A';
-              document.getElementById('pPhone').textContent = getParam('phone') || 'N/A';
-              document.getElementById('pBlood').textContent = getParam('bloodGroup') || 'N/A';
-              
-              loadPatientRecords();
-
-          } else if (userRole === 'doctor') {
-              document.getElementById('doctorDashboard').classList.remove('hidden');
-              document.getElementById('dName').textContent = 'Dr. ' + (userName || 'N/A');
-              document.getElementById('dEmail').textContent = userEmail || 'N/A';
-              document.getElementById('dLicense').textContent = getParam('licenseNumber') || 'N/A';
-              document.getElementById('dSpecialty').textContent = getParam('specialty') || 'N/A';
-          }
-      });
+      document.addEventListener('DOMContentLoaded', loadUserProfile);
 
       // PATIENT FUNCTIONS
       async function generateOTP() {
@@ -272,7 +280,7 @@
               const res = await fetch('/api/generate-otp', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ email: userEmail, otp })
+                  body: JSON.stringify({ otp })
               });
               const data = await res.json();
               if (data.success) {
@@ -312,7 +320,7 @@
               const res = await fetch('/api/my-records', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ email: userEmail })
+                  body: JSON.stringify({})
               });
               const data = await res.json();
               
@@ -390,8 +398,8 @@
           if (!disease || !prescription) {
               return showAlert('Please fill out both Diagnosis and Prescription fields.', false);
           }
-          if (!userEmail) {
-              return showAlert('Doctor email missing from session. Please login again.', false);
+          if (!activePatientId) {
+              return showAlert('Patient ID missing. Please verify patient access code again.', false);
           }
 
           const btn = event.target;
@@ -404,7 +412,6 @@
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
                       patientId: activePatientId,
-                      doctorEmail: userEmail,
                       disease,
                       prescription
                   })

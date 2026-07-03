@@ -20,7 +20,11 @@
   },
   "homepage": "https://github.com/Hariharan90252/Medical_History#readme",
   "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.0",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^9.3.1"
   }
 }
